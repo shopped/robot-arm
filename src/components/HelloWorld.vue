@@ -1,16 +1,33 @@
 <template>
-  <div class="hello">
-		<div v-for="(servo, index) in position" :key="index">
-			<p v-if="Object.keys(labels).includes(String(index))">
-				{{labels[index]  }} :
-				<input type="text" v-model="position[index]">
-				<input type="range" min=0 max=180 v-model="position[index]">
-			</p>
+	<div class="container">
+		<div class="row">
+			<div class="child">
+				<div v-for="(servo, index) in position" :key="index">
+					<p v-if="Object.keys(labels).includes(String(index))">
+						{{labels[index]  }} :
+						<input type="text" v-model="position[index]">
+						<input type="range" min=0 max=180 v-model="position[index]">
+					</p>
+				</div>
+				<button v-on:click="console.log('clicked')">Send</button>
+				<br>
+				<button v-on:click="console.log('clicked')">Save</button>
+			</div>
+			<div class="child">
+				<p>List of saved configs go here</p>
+			</div>
 		</div>
-		<button v-on:click="alert('clicked')">Send</button>
-<br>
-		<button v-on:click="alert('clicked')">Save</button>
-  </div>
+		<div class="row">
+			<div class="child">
+				<h1>Rotation Canvas</h1>
+				<canvas id="rotation-canvas" width="500px" height="500px"></canvas>
+			</div>
+			<div class="child">
+				<h1>Position Canvas</h1>
+					<canvas id="position-canvas" width="500px" height="500px"></canvas>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -28,6 +45,18 @@ export default {
 				6: "Clamp"
 			}
 		}
+	},
+	mounted: function() {
+		const canvas1 = document.getElementById('rotation-canvas');
+		const canvas2 = document.getElementById('position-canvas');
+		const c1 = canvas1.getContext('2d');
+		const c2 = canvas2.getContext('2d');
+		c1.beginPath();
+		c1.moveTo(100, 100);
+		c1.lineTo(200, 200);
+		c1.lineWidth = 5;
+		c1.stroke();
+		console.log(c2);
 	}
 }
 </script>
@@ -37,15 +66,11 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.container {
+	display: flex;
+	flex-direction: column;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.row {
+	display: flex;
 }
 </style>
