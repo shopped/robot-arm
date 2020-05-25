@@ -34,7 +34,7 @@
 					<canvas id="position-canvas" width="500px" height="500px"></canvas>
 			</div>
 			<div class="child">
-				<Three />
+				<Three v-bind:position="animatedPosition"/>
 			</div>
 		</div>
 	</div>
