@@ -4,6 +4,7 @@
   </div>
 </template>
 
+<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
 <script>
 import HelloWorld from './components/HelloWorld.vue'
 
@@ -11,7 +12,13 @@ export default {
   name: 'App',
   components: {
     HelloWorld
-  }
+  },
+  ignoredElements: [
+      'a-scene',
+      'a-entity',
+      'a-camera',
+      'a-box'
+  ]
 }
 </script>
 <style>

@@ -34,7 +34,7 @@
 					<canvas id="position-canvas" width="500px" height="500px"></canvas>
 			</div>
 			<div class="child">
-				<h1>3d Model here</h1>
+				<Three />
 			</div>
 		</div>
 	</div>
@@ -43,9 +43,13 @@
 <script>
 const axios = require('axios');
 import { gsap } from "gsap";
+import Three from './Three.vue';
 
 export default {
   name: 'HelloWorld',
+  components: {
+		Three
+  },
 	data: function() {
 		const tp = {};
 		[...new Array(16)].map((v, i) => tp[i] = 0);
