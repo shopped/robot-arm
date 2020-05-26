@@ -17,7 +17,6 @@ export default {
       controls: null,
       origin: {x: 0, y: 0, z: 0},
       all: [],
-      counter: 0
     }
   },
   methods: {
@@ -25,7 +24,7 @@ export default {
         let container = document.getElementById('three');
 
         this.camera = new Three.PerspectiveCamera(70, container.clientWidth/container.clientHeight, 0.01, 10);
-        this.camera.position.z = 1;
+        this.camera.position.z = 3;
 
         this.scene = new Three.Scene();
 
@@ -35,9 +34,8 @@ export default {
         this.createComponent(0.2, 0.3, 0.1, 0.1, 0.15, 0, 0, 0.1, 0);
         // shoulder joint
         this.createComponent(0.1, 0.6, 0.2, 0, 0.3, 0, 0, 0.4, 0);
-        // this.all[0].position.x += 1000;
-        // this.all[1].position.x += 1000;
         // elbow joint
+        this.createComponent(0.1, 0.6, 0.2, 0, 0.3, 0, 0, 1.0, 0);
         // wrist joint
         // wrist rotation motor
         // clamp
@@ -65,23 +63,6 @@ export default {
     },
     animate: function() {
         requestAnimationFrame(this.animate);
-        this.counter++;
-        if (this.counter >= 300) {
-          this.counter = 0;
-        }
-        if (Math.floor(this.counter / 100) === 0) {
-          this.all[2].rotation.x += 2*Math.PI/100;
-          this.all[2].rotation.y = 0;
-          this.all[2].rotation.z = 0;
-        } else if (Math.floor(this.counter / 100) === 1) {
-          this.all[2].rotation.x = 0;
-          this.all[2].rotation.y += 2*Math.PI/100;
-          this.all[2].rotation.z = 0;
-        } else {
-          this.all[2].rotation.x = 0;
-          this.all[2].rotation.y = 0;
-          this.all[2].rotation.z += 2*Math.PI/100;
-        }
         this.renderer.render(this.scene, this.camera);
     }
   },
@@ -94,7 +75,19 @@ export default {
       const parsedV = v.map(i => parseInt(i)/180*Math.PI)
       this.all[1].rotation.y = parsedV[0];
       this.all[2].rotation.y = parsedV[0];
+      this.all[3].rotation.y = parsedV[0];
+
       this.all[2].rotation.z = parsedV[1];
+
+      // xy adjustments from z axis shoulder rotation
+      // xz adjustments from y axis base rotation
+      // The third thing is I'm not sure, probably some function of the first two partial derivative bullshit
+      this.all[3].position.x = -(0.6)*Math.cos(parsedV[0])*Math.sin(parsedV[1]);
+      this.all[3].position.y = 0.3 + (0.6)*Math.cos(parsedV[1]);
+      this.all[3].position.z = (0.6)*Math.sin(parsedV[0])*Math.sin(parsedV[1]);
+
+      this.all[3].rotation.z = parsedV[2];
+      this.all[3].rotation.z += parsedV[1];
     }
   }
 }
