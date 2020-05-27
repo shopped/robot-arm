@@ -1,8 +1,10 @@
 const express = require('express')
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express()
 const port = 3000
-const bodyParser = require('body-parser');
 app.use(bodyParser.json());
+app.use(cors())
 
 const redis = require("redis");
 const client = redis.createClient();
@@ -22,7 +24,8 @@ app.get('/init', async (req, res) => {
     res.send(init);
 })
 app.post('/init', async (req, res) => {
-    await client.set("init", req.body.data);
+    const data = JSON.stringify(req.body.data);
+    await client.set("init", data);
     res.send('K');
 })
 
@@ -33,7 +36,7 @@ app.post('/pos', (req, res) => {
     res.send('todo');
 })
 
-app.post('/go', (req, res) => {
+app.post('/pubsub', (req, res) => {
     publisher.publish("arms", req.body.data);
     res.send("ok am working async look at your robot arms rn")
 });

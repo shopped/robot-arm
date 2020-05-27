@@ -34,6 +34,8 @@
 						<input type="range" min=-360 max=360 v-model.Number="initialOffset[index]">
 					</p>
 				</div>
+				<br>
+				<button v-on:click="setInit()">Set</button>
 			</div>
 		</div>
 		<div class="row">
@@ -87,6 +89,8 @@ export default {
 			cw: 0,
 			ch: 0,
 			ip: 'http://192.168.1.123:5000',
+			init: 'http://localhost:3000/init',
+			pubsub: 'http://localhost:3000/pubsub',
 			trash: null
 		}
 	},
@@ -98,6 +102,7 @@ export default {
 		}
 	},
 	mounted: function() {
+		this.getInit();
 		const canvas1 = document.getElementById('rotation-canvas');
 		const canvas2 = document.getElementById('position-canvas');
 		const cr = canvas1.getContext('2d');
@@ -111,6 +116,13 @@ export default {
 		this.ch = canvas2.height;
 	},
 	methods: {
+		setInit: function() {
+			axios.post(this.init, {data: this.initialOffset});
+		},
+		getInit: async function() {
+			const initialValues = await axios.get(this.init);
+			this.initialOffset = initialValues.data;
+		},
 		saveState: function() {
 			const key = "new";
 			let counter = 1;
