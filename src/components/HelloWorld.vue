@@ -13,15 +13,27 @@
 				<br>
 				<button v-on:click="randomize()">Randomize</button>
 				<br>
-				<button v-on:click="save()">Save</button>
+				<button v-on:click="reset()">Reset</button>
+				<br>
+				<button v-on:click="saveState()">Save</button>
 			</div>
 			<div class="child">
 				<p>Put ip here</p>
 				<input type="text" v-model="ip">
 				<p>List of saved configs go here</p>
+				<span v-for="(value, name) in this.saved" :key="name">
+					<button v-on:click="loadState(value)">{{name}} {{value}}</button>
+				</span>
 			</div>
 			<div class="child">
-				<h1>Camera feed here</h1>
+				<h1>Initial Offset</h1>
+				<div v-for="(servo, index) in initialOffset" :key="index+'i'">
+					<p v-if="Object.keys(labels).includes(String(index))">
+						{{labels[index]  }} :
+						<input type="text" v-model.Number="initialOffset[index]" style="width: 50px;">
+						<input type="range" min=-360 max=360 v-model.Number="initialOffset[index]">
+					</p>
+				</div>
 			</div>
 		</div>
 		<div class="row">
@@ -44,6 +56,7 @@
 const axios = require('axios');
 import { gsap } from "gsap";
 import Three from './Three.vue';
+import Vue from 'vue';
 
 export default {
   name: 'HelloWorld',
@@ -54,7 +67,13 @@ export default {
 		const tp = {};
 		[...new Array(16)].map((v, i) => tp[i] = 0);
 		return {
-			position: [...new Array(16)].map(() => 0),
+			position: [...new Array(6)].map(() => 0),
+			initialOffset: [...new Array(6)].map(() => 0),
+			saved: {
+				straight: [0,0,0,0,0,0],
+				halfway: [90,90,90,90,90,90],
+				flexed: [180,180,180,180,180,180]
+			},
 			tweenedPosition: tp,
 			labels: {
 				0: "Base Rotation",
@@ -67,7 +86,8 @@ export default {
 			canvas: {},
 			cw: 0,
 			ch: 0,
-			ip: 'http://192.168.1.123:5000'
+			ip: 'http://192.168.1.123:5000',
+			trash: null
 		}
 	},
 	computed: {
@@ -91,8 +111,23 @@ export default {
 		this.ch = canvas2.height;
 	},
 	methods: {
-		save: function() {
-			console.log("SAVED");
+		saveState: function() {
+			const key = "new";
+			let counter = 1;
+			while (Object.keys(this.saved).includes(key+counter)) {
+				counter++;
+			}
+			Vue.set(this.saved, key+counter, this.position.slice(0,6));
+		},
+		loadState: function(value) {
+			const newPosition = [];
+			for (let i=0;i<6; i++) {
+				newPosition.push(value[i]);
+			}
+			this.position = newPosition;
+		},
+		reset: function() {
+			this.position = [...new Array(16)].map(() => 0);
 		},
 		send: function() {
 			axios.post(this.ip, this.position);
@@ -151,14 +186,21 @@ export default {
 				cp.lineTo(prevx, 500 - prevy);
 				cp.stroke();
 			}
-			console.log(b, c, d, e);
+			this.trash = d + e;
 		}
 	},
 	watch: {
 		position: {
 			handler: function(vals) {
 				for (let i=0;i<vals.length;i++) {
-					gsap.to(this.$data.tweenedPosition, { duration: 0.5, [i]: vals[i]})
+					gsap.to(this.$data.tweenedPosition, { duration: 0.5, [i]: parseInt(vals[i]) + parseInt(this.initialOffset[i]) })
+				}
+			}
+		},
+		initialOffset: {
+			handler: function(vals) {
+				for (let i=0;i<vals.length;i++) {
+					gsap.to(this.$data.tweenedPosition, { duration: 0.5, [i]: parseInt(vals[i]) + parseInt(this.position[i]) })
 				}
 			}
 		},
