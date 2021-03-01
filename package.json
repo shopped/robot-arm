@@ -14,7 +14,7 @@
     "express": "^4.17.1",
     "gsap": "^3.2.6",
     "redis": "^3.0.2",
-    "three": "^0.116.1",
+    "three": "^0.125.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
